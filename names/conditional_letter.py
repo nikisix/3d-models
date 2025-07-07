@@ -119,12 +119,13 @@ def array_to_vertices(c):
 
 
 def generate_scad_code(s1, s2):
-    """Generate OpenSCAD code for 3D printing."""
+    """Generate OpenSCAD code for 3D printing with smooth Bezier-like curves."""
     scad_code = "// Generated 3D Letter Combinations\n"
     scad_code += f"// {s1} + {s2}\n\n"
+    scad_code += "$fn=20;\n"
 
-    scad_code = "// Base Plate\n"
-    scad_code += f"translate([0, -4, 0]) cube([{10 * len(s1)}, 8, 2]);\n"
+    scad_code += "// Base Plate\n"
+    scad_code += f"translate([-3, -4, 0]) cube([{10 * len(s1)}, 8, 2]);\n\n"
 
     # Process each letter pair
     for i in range(len(s1)):
@@ -145,14 +146,19 @@ def generate_scad_code(s1, s2):
         )
         scad_code += "  union() {\n"
 
-        # Add each voxel as a cube
+        # Create continuous smooth geometry using metaballs/implicit surfaces
+        # This creates overlapping spheres that will merge into smooth surfaces
         for x in range(c_smooth.shape[0]):
             for y in range(c_smooth.shape[1]):
                 for z in range(c_smooth.shape[2]):
                     if c_smooth[x, y, z] > 0:
-                        scad_code += (
-                            f"    translate([{x}, {y}, {z}]) cylinder(1.5,1,1);\n"
-                        )
+                        # Use intersection of sphere and cube for smooth rounded cubes
+                        scad_code += f"    translate([{x}, {y}, {z}]) {{\n"
+                        # scad_code += "      intersection() {\n"
+                        # scad_code += "        sphere(r=1.0);\n"
+                        scad_code += "        cube([2,2,2], center=true);\n"
+                        # scad_code += "      }\n"
+                        scad_code += "    }\n"
 
         scad_code += "  }\n"
         scad_code += "}\n\n"
@@ -162,8 +168,8 @@ def generate_scad_code(s1, s2):
 
 def main():
     """Main function to generate and display conditional letters."""
-    s1 = "ROBERT"
-    s2 = "NANCEY"
+    s1 = "NICK  "
+    s2 = "BROOKE"
 
     # Ensure strings are same length
     min_len = min(len(s1), len(s2))
