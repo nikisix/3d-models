@@ -13,6 +13,7 @@ import letter_to_pixel as ltp
 
 import pythonopenscad as posc
 from euclid3 import Point3
+import sys
 
 # |%%--%%| <WXj8UyVFXG|6bIykLUAam>
 
@@ -167,13 +168,15 @@ def generate_scad_code(s1, s2):
 
 
 def main():
-    """Main function to generate and display conditional letters."""
-    s1 = "NICK  "
-    s2 = "BROOKE"
+    """Main function to generate and display conditional letters.
+    run like: python conditional_letter.py name1 name2"""
+
+    s1 = str(sys.argv[2]).upper()
+    s2 = str(sys.argv[1]).upper()
 
     # Ensure strings are same length
-    min_len = min(len(s1), len(s2))
-    s1, s2 = s1[:min_len], s2[:min_len]
+    # min_len = min(len(s1), len(s2))
+    # s1, s2 = s1[:min_len], s2[:min_len]
 
     all_objects = []
 
@@ -211,7 +214,7 @@ def main():
         print("Generating OpenSCAD code for 3D printing...")
         scad_code = generate_scad_code(s1, s2)
 
-        filename = f"{s1}_{s2}_conditional_letters.scad"
+        filename = f"out/{s1}_{s2}_conditional_letters.scad"
         with open(filename, "w") as f:
             f.write(scad_code)
         print(f"OpenSCAD model exported to {filename}")
